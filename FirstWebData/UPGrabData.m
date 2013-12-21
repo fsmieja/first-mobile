@@ -30,7 +30,7 @@
 }
 
 
--(void)GetUrlSummaryForUrlId:(int)urlid {
+-(void)GetUrlSummaryForUrlId:(int)urlid  {
     NSLog(@"Want to talk to URLPoke using url id %d", urlid);
     
     NSString *urlidStr = [NSString stringWithFormat:@"%d", urlid];
@@ -62,5 +62,6 @@
     else {
         self.errorText = @"Unexpected error";
     }
+
 }
 @end

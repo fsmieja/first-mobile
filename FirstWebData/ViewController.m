@@ -32,11 +32,13 @@
 -(IBAction)GetUrlData:(id)sender{
     UPGrabData *grabData = [[UPGrabData alloc] init];
     [grabData setRemoteUrl:@"http://orion:3000/api/v1/url/get"];
+    [myActivityIndicator startAnimating];
     [grabData setDelegate:self];
-    [grabData GetUrlSummaryForUrlId:urlid.text.intValue ];
+    [grabData GetUrlSummaryForUrlId:urlid.text.intValue];
 }
 
 -(void)downloadSuccessful:(BOOL)success withData:(UPGrabData *)grabData {
+    [myActivityIndicator stopAnimating];
     urlName.text = [grabData GetUrlValue:@"url"];
     threshold.text = [grabData GetUrlValue:@"threshold"];
     averageVal.text = [grabData GetUrlValue:@"average"];
