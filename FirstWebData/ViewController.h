@@ -24,5 +24,5 @@ char *name;
 
 -(IBAction)GetUrlData:(id)sender;
 -(IBAction)GetUrl:(id)sender;
-
+-(void)populateUrlDetails:(NSDictionary *) dict;
 @end

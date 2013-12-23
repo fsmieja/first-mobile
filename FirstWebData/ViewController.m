@@ -14,8 +14,7 @@
 #import "OAuthConsumer.h"
 #import "UPGrabData.h"
 
-@interface ViewController () {
-}
+@interface ViewController ()
 
 @end
 
@@ -25,8 +24,15 @@
 - (UITextField *) textFieldAtIndex:(NSUInteger) index;
 @end
 
-@implementation ViewController
+@implementation ViewController {
+}
 
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    // Initialize table data
+    urlid.delegate = self;
+}
 
 
 -(IBAction)GetUrlData:(id)sender{
@@ -37,12 +43,20 @@
     [grabData GetUrlSummaryForUrlId:urlid.text.intValue];
 }
 
+
 -(void)downloadSuccessful:(BOOL)success withData:(UPGrabData *)grabData {
     [myActivityIndicator stopAnimating];
     urlName.text = [grabData GetUrlValue:@"url"];
     threshold.text = [grabData GetUrlValue:@"threshold"];
     averageVal.text = [grabData GetUrlValue:@"average"];
     lastMeasured.text = [NSString stringWithFormat:@"%@ ago",[grabData GetUrlValue:@"last_stat"]];
+}
+
+-(void)populateUrlDetails:(NSDictionary *) dict {
+    urlName.text = [dict valueForKey:@"url"];
+    threshold.text = [dict valueForKey:@"threshold"];
+    averageVal.text = [dict valueForKey:@"average"];
+    lastMeasured.text = [NSString stringWithFormat:@"%@ ago",[dict valueForKey:@"last_stat"]];
 }
 
 -(IBAction)GetUrl:(id)sender{
@@ -148,12 +162,14 @@
     [textField resignFirstResponder];
     return TRUE;
 }
+/*
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     urlid.delegate = self;
     // Do any additional setup after loading the view, typically from a nib.
 }
+ */
 
 - (void)didReceiveMemoryWarning
 {

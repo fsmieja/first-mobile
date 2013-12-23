@@ -7,12 +7,22 @@
 //
 
 #import "AppDelegate.h"
+#import "ViewController.h"
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
+    
+ //   self.viewController = [[ViewController alloc] initWithNibName:@"ViewController" bundle:nil];
+    /*
+    self.navController = [[UINavigationController alloc] initWithRootViewController:self.viewController];
+    
+    [self.navController.navigationBar setBarStyle:UIBarStyleBlack];
+    
+    [self.window addSubview:self.navController.view];
+    */
     return YES;
 }
 							

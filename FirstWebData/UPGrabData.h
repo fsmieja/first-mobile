@@ -20,11 +20,16 @@
 
 @property (copy) NSString *remoteUrl;
 @property (copy) NSMutableDictionary *urlVals;
+@property (copy) NSArray *urlList;
 @property (copy) NSString *errorText;
 @property (copy) NSDictionary *jsonArray;
 @property (retain) id delegate;
+@property (copy) NSString *requestType;
 
 -(void)GetUrlSummaryForUrlId:(int)urlid;
+-(void)GetUrlListForUser;
 -(NSString *)GetUrlValue:(NSString *)key;
+-(NSDictionary *)GetUrlDetails:(int)index;
+-(NSString *)GetUrlList:(NSString *)key;
 @end
 
