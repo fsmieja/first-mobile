@@ -11,7 +11,6 @@
 #import "ASIFormDataRequest.h"
 #import "SBJson.h"
 //#include "<sys/types.h>"
-#import "OAuthConsumer.h"
 #import "UPGrabData.h"
 
 @interface ViewController ()

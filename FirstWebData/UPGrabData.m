@@ -10,7 +10,6 @@
 #import "ASIFormDataRequest.h"
 #import "ASIHTTPRequest.h"
 #import "SBJson.h"
-#import "OAuthConsumer.h"
 #import "UPParseUrlData.h"
 
 
