@@ -9,6 +9,7 @@
 #import "TableViewController.h"
 #import "UPGrabData.h"
 #import "ViewController.h"
+#import "ASIHTTPRequest.h"
 
 UPGrabData *grabData;
 
@@ -84,7 +85,24 @@ UPGrabData *grabData;
 }
 
 -(IBAction)Logout:(id)sender{
+  //  [ASIHTTPRequest removeCredentialsForHost:@"orion" port:0 protocol:@"http" realm:nil];
+    [ASIHTTPRequest clearSession];
+    NSURLCredentialStorage *store = [NSURLCredentialStorage sharedCredentialStorage];
+    for (NSURLProtectionSpace *space in [store allCredentials]) {
+        NSDictionary *userCredentialMap = [store credentialsForProtectionSpace:space];
+        for (NSString *user in userCredentialMap) {
+            NSURLCredential *credential = [userCredentialMap objectForKey:user];
+            [store removeCredential:credential forProtectionSpace:space];
+        }
+    }
     
+    // clear keychain
+    /*
+    NSURL *url = [NSURL URLWithString:kConnectorUrlString];
+    [ASIHTTPRequest removeCredentialsForHost:[url host] port:[[url port] intValue] protocol:[url scheme] realm:kConnectorRealm];
+     */
+    NSLog(@"logged out");
+
 }
 
 -(void)downloadSuccessful:(BOOL)success withData:(UPGrabData *)grabData {

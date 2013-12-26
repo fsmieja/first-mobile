@@ -46,8 +46,9 @@
     ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
     [request setShouldPresentAuthenticationDialog:YES];
     request.userInfo = [NSDictionary dictionaryWithObject:@"urllist" forKey:@"type"];
-    [request setUseKeychainPersistence:YES];
+    [request setUseKeychainPersistence:YES ];
     [request setDelegate:self];
+    
     [request setRequestMethod:@"GET"];
     [request startAsynchronous];
 }
