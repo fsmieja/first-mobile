@@ -10,16 +10,11 @@
 //#import "UPGrabData.h"
 
 @interface TableViewController : UITableViewController <UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate>
-{
-    
-   // IBOutlet UITableView *myTableView;
-   // IBOutlet UIActivityIndicatorView *myActivityIndicator;
-
-}
 
 @property (assign, nonatomic) BOOL ascending;
 
-
+-(void)reportError:(NSString *)message;
+-(void)populateUrlList:(NSArray *)urlList;
 -(IBAction)GetUrlData:(id)sender;
 -(IBAction)Logout:(id)sender;
 @end

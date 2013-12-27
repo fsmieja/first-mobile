@@ -10,12 +10,14 @@
 #import "UPGrabData.h"
 
 char *name;
+NSString *thisUrlId;
 
 @interface ViewController : UIViewController <UITextFieldDelegate>
 {
     IBOutlet UILabel *urlName;
     IBOutlet UILabel *threshold;
     IBOutlet UILabel *averageVal;
+    IBOutlet UILabel *latestVal;
     IBOutlet UILabel *lastMeasured;
     IBOutlet UILabel *errorField;
     IBOutlet UITextField *urlid;

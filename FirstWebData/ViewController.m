@@ -34,12 +34,12 @@
 }
 
 
--(IBAction)GetUrlData:(id)sender{
+-(IBAction)GetUrlData:(id)sender {
     UPGrabData *grabData = [[UPGrabData alloc] init];
     [grabData setRemoteUrl:@"http://orion:3000/api/v1/url/get"];
     [myActivityIndicator startAnimating];
     [grabData setDelegate:self];
-    [grabData GetUrlSummaryForUrlId:urlid.text.intValue];
+    [grabData GetUrlSummaryForUrlId:[thisUrlId intValue]];
 }
 
 
@@ -54,9 +54,25 @@
 
 -(void)populateUrlDetails:(NSDictionary *) dict {
     urlName.text = [dict valueForKey:@"url"];
+    thisUrlId = [dict valueForKey:@"id"];
     threshold.text = [dict valueForKey:@"threshold"];
     averageVal.text = [dict valueForKey:@"average"];
+    latestVal.text = [dict valueForKey:@"latest_val"];
     lastMeasured.text = [NSString stringWithFormat:@"%@ ago",[dict valueForKey:@"last_stat"]];
+    NSString *isDown = [dict objectForKey:@"is_down"] ;
+    NSString *isOverThreshold = [dict objectForKey:@"is_over_threshold"];
+    NSString *isRecentRecovered = [dict objectForKey:@"recovery"];
+
+    errorField.text = [dict objectForKey:@"message"];
+    UIColor *redColour = [UIColor redColor];
+    UIColor *yellowColour = [UIColor yellowColor];
+    UIColor *greenColour = [UIColor greenColor];
+    if ([isDown boolValue] || [isOverThreshold boolValue])
+        errorField.textColor = redColour;
+    else if ([isRecentRecovered boolValue])
+        errorField.textColor = yellowColour;
+    else
+        errorField.textColor = greenColour;
 }
 
 -(IBAction)GetUrl:(id)sender{

@@ -16,6 +16,8 @@ UPGrabData *grabData;
 @interface TableViewController ()
 {
     NSMutableArray *tableData;
+    NSMutableArray *tableDetail;
+    NSMutableArray *tableImage;
 }
 @end
 
@@ -37,14 +39,20 @@ UPGrabData *grabData;
     [super viewDidLoad];
 
     // Initialize table data
+    /*
     tableData = [NSMutableArray arrayWithObjects:@"Egg Benedict", @"Mushroom Risotto", @"Full Breakfast", @"Hamburger", @"Ham and Egg Sandwich", @"Creme Brelee", @"White Chocolate Donut", @"Starbucks Coffee", nil];
+     */
    // myTableView.delegate = self;
-    
+    tableData = [[NSMutableArray alloc] init];
+    tableDetail = [[NSMutableArray alloc] init];
+    tableImage = [[NSMutableArray alloc] init];
     UIRefreshControl *refreshControl = [[UIRefreshControl alloc]
                                         init];
     refreshControl.tintColor = [UIColor brownColor];
     [refreshControl addTarget:self action:@selector(reloadData) forControlEvents:UIControlEventValueChanged];
     self.refreshControl = refreshControl;
+    
+    [self updateTable];
 }
 
 
@@ -64,8 +72,7 @@ UPGrabData *grabData;
     
     _ascending = !_ascending;
     
-    [self performSelector:@selector(updateTable) withObject:nil
-               afterDelay:1];
+    [self performSelector:@selector(updateTable) withObject:nil  afterDelay:1];
 }
 
 - (void)updateTable
@@ -105,24 +112,42 @@ UPGrabData *grabData;
 
 }
 
+-(void)populateUrlList:(NSArray *)urlList {
+    [tableData removeAllObjects];
+    int i=0;
+    for (NSDictionary *thisUrl in urlList) {
+        NSString *urlName = [thisUrl objectForKey:@"url"];
+        NSString *urlAverage = [thisUrl objectForKey:@"average"];
+        NSString *isDown = [thisUrl objectForKey:@"is_down"] ;
+        NSString *isOverThreshold = [thisUrl objectForKey:@"is_over_threshold"];
+        [tableData insertObject:urlName atIndex:i];
+        [tableDetail insertObject:urlAverage atIndex:i];
+        
+        if ([isDown boolValue])
+            [tableImage insertObject:@"alert.png" atIndex:i];
+        else if ([isOverThreshold boolValue])
+            [tableImage insertObject:@"slow.jpg" atIndex:i];
+        else
+            [tableImage insertObject:@"ok2.png" atIndex:i];
+         
+        i++;
+    }
+}
+
+-(void)reportError:(NSString *)alertMessage {
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:alertMessage delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    [alert show];
+}
+
 -(void)downloadSuccessful:(BOOL)success withData:(UPGrabData *)grabData {
   //  [myActivityIndicator stopAnimating];
     if (success) {
-        [tableData removeAllObjects];
-        int i=0;
-        for (NSDictionary *thisUrl in grabData.urlList) {
-            NSString *urlName = [thisUrl objectForKey:@"url"];
-            [tableData insertObject:urlName atIndex:i];
-            i++;
-        }
+        [self populateUrlList:grabData.urlList];
+        [self.tableView reloadData];
     }
     else {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:[NSString stringWithFormat:@"Unexpected error"] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-        [alert show];
-        
-        
+        [self reportError:@"Unexpected error"];
     }
-    [self.tableView reloadData];
     
     [self.refreshControl endRefreshing];
 
@@ -169,7 +194,8 @@ UPGrabData *grabData;
     }
     
     cell.textLabel.text = [tableData objectAtIndex:indexPath.row];
-    cell.detailTextLabel.text = [NSString stringWithFormat:@"Current average: %dms", 340];
+    cell.detailTextLabel.text = [NSString stringWithFormat:@"Current average: %@ms", [tableDetail objectAtIndex:indexPath.row]];
+    cell.imageView.image = [UIImage imageNamed:[tableImage objectAtIndex:indexPath.row]];
     return cell;
 }
 
