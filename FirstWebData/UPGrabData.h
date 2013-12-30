@@ -25,6 +25,7 @@
 @property (copy) NSDictionary *jsonArray;
 @property (retain) id delegate;
 @property (copy) NSString *requestType;
+@property (copy) NSMutableArray *urlPoints;
 
 -(void)GetUrlSummaryForUrlId:(int)urlid;
 -(void)GetUrlListForUser;

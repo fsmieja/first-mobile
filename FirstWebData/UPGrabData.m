@@ -18,6 +18,7 @@
 -(id)init{
     self = [super init];
     _urlVals = [[NSMutableDictionary alloc] init];
+    _urlPoints = [[NSMutableArray alloc] init];
     _errorText = [[NSString alloc] init];
     _urlList = [[NSArray alloc] init];
     _remoteUrl = @"http://orion:3000/api/v1/url/get";

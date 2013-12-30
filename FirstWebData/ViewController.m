@@ -12,6 +12,7 @@
 #import "SBJson.h"
 //#include "<sys/types.h>"
 #import "UPGrabData.h"
+#import "UPPlotViewController.h";
 
 @interface ViewController ()
 
@@ -73,6 +74,9 @@
         errorField.textColor = yellowColour;
     else
         errorField.textColor = greenColour;
+    
+    urlStats = [dict objectForKey:@"stats"];
+    
 }
 
 -(IBAction)GetUrl:(id)sender{
@@ -191,6 +195,17 @@
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+-(IBAction)GetUrlPlot:(id)sender
+{
+    UIStoryboard *sboard = [UIStoryboard storyboardWithName:@"MainStoryboard"
+                                                     bundle:nil];
+    UPPlotViewController *urlPlot = [sboard instantiateViewControllerWithIdentifier:@"idUrlPlot"];
+    
+    [self.navigationController pushViewController:urlPlot animated:YES];
+    [urlPlot populateUrlPlot:urlStats urlName:urlName.text urlId:thisUrlId];
+    
 }
 
 @end

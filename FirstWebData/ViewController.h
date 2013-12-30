@@ -11,6 +11,7 @@
 
 char *name;
 NSString *thisUrlId;
+NSArray *urlStats;
 
 @interface ViewController : UIViewController <UITextFieldDelegate>
 {
@@ -26,5 +27,6 @@ NSString *thisUrlId;
 
 -(IBAction)GetUrlData:(id)sender;
 -(IBAction)GetUrl:(id)sender;
+-(IBAction)GetUrlPlot:(id)sender;
 -(void)populateUrlDetails:(NSDictionary *) dict;
 @end

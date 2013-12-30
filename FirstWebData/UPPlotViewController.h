@@ -8,6 +8,20 @@
 
 #import <UIKit/UIKit.h>
 
-@interface UPPlotViewController : UIViewController
+NSString *urlId;
+NSString *urlName;
+NSArray *urlStats;
+int maxYValue;
 
+@interface UPPlotViewController : UIViewController <CPTPlotDataSource>
+
+@property (nonatomic, strong) CPTGraphHostingView *hostView;
+@property (copy) NSDictionary *urlData;
+
+
+-(void)populateUrlPlot:(NSArray *)stats urlName:(NSString *)name urlId:(NSString *)thisId;
+-(NSNumber *)getIntDate:(NSString *)dateString;
+-(void)setAxesLimits:(CPTXYPlotSpace *)plotSpace;
+-(int)getMaxYValue;
+-(int)getMinXValue;
 @end
