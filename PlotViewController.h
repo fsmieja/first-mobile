@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface PlotViewController : UIViewController
+@interface PlotViewController : UIViewController <CPTPlotDataSource>
+
+@property (nonatomic, strong) CPTGraphHostingView *hostView;
 
 @end
