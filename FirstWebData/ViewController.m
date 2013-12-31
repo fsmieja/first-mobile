@@ -204,7 +204,7 @@
     UPPlotViewController *urlPlot = [sboard instantiateViewControllerWithIdentifier:@"idUrlPlot"];
     
     [self.navigationController pushViewController:urlPlot animated:YES];
-    [urlPlot populateUrlPlot:urlStats urlName:urlName.text urlId:thisUrlId];
+    [urlPlot populateUrlPlot:urlStats urlName:urlName.text urlId:thisUrlId threshold:threshold.text];
     
 }
 

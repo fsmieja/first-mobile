@@ -9,9 +9,9 @@
 #import <UIKit/UIKit.h>
 
 NSString *urlId;
-NSString *urlName;
+NSString *urlName, *urlThreshold;
 NSArray *urlStats;
-int maxYValue;
+int maxYValue, minXValue, maxXValue;
 
 @interface UPPlotViewController : UIViewController <CPTPlotDataSource>
 
@@ -19,9 +19,10 @@ int maxYValue;
 @property (copy) NSDictionary *urlData;
 
 
--(void)populateUrlPlot:(NSArray *)stats urlName:(NSString *)name urlId:(NSString *)thisId;
+-(void)populateUrlPlot:(NSArray *)stats urlName:(NSString *)name urlId:(NSString *)thisId threshold:(NSString *)threshold;
 -(NSNumber *)getIntDate:(NSString *)dateString;
 -(void)setAxesLimits:(CPTXYPlotSpace *)plotSpace;
 -(int)getMaxYValue;
 -(int)getMinXValue;
+-(int)getYMajorInterval;
 @end
