@@ -80,7 +80,12 @@
     CPTMutableTextStyle *titleStyle = [CPTMutableTextStyle textStyle];
     titleStyle.color = [CPTColor whiteColor];
     titleStyle.fontName = @"Helvetica-Bold";
-    titleStyle.fontSize = 16.0f;
+    
+    if ([title length] > 30 && UIDeviceOrientationIsPortrait(self.interfaceOrientation))
+        titleStyle.fontSize = 12.0f;
+    else
+        titleStyle.fontSize = 16.0f;
+    
     graph.titleTextStyle = titleStyle;
     graph.titlePlotAreaFrameAnchor = CPTRectAnchorTop;
     graph.titleDisplacement = CGPointMake(0.0f, 10.0f);
@@ -97,19 +102,18 @@
     CPTGraph *graph = self.hostView.hostedGraph;
     CPTXYPlotSpace *plotSpace = (CPTXYPlotSpace *) graph.defaultPlotSpace;
 
+   // [self addPlotToGraph:graph name:@"URL Plot"]
     // Create the data plot
     CPTScatterPlot *urlPlot = [[CPTScatterPlot alloc] init];
-    urlPlot.dataSource = self;
-    urlPlot.identifier = @"URL Plot";
-    CPTColor *urlColor = [CPTColor redColor];
     [graph addPlot:urlPlot toPlotSpace:plotSpace];
 
     // Create the threshold line
     CPTScatterPlot *thresholdPlot = [[CPTScatterPlot alloc] init];
-    thresholdPlot.dataSource = self;
-    thresholdPlot.identifier = @"Threshold";
-    CPTColor *thresholdColor = [CPTColor greenColor];
     [graph addPlot:thresholdPlot toPlotSpace:plotSpace];
+
+    // Create the average line
+    CPTScatterPlot *averagePlot = [[CPTScatterPlot alloc] init];
+    [graph addPlot:averagePlot toPlotSpace:plotSpace];
 
     // Set up plot space
     [plotSpace scaleToFitPlots:[NSArray arrayWithObjects:urlPlot, thresholdPlot, nil]];
@@ -124,120 +128,130 @@
     plotSpace.yRange = yRange;
     
     
-    graph.legend = [CPTLegend legendWithGraph:graph];
-    graph.legend.fill = [CPTFill fillWithColor:[CPTColor darkGrayColor]];
-    graph.legend.cornerRadius = 5.0;
-    graph.legend.swatchSize = CGSizeMake(15.0, 15.0);
-    graph.legendAnchor = CPTRectAnchorBottomRight;
-    graph.legendDisplacement = CGPointMake(0.0, 12.0);
     
-    
-    // 4 - Create styles and symbols
     CPTMutableLineStyle *urlLineStyle = [urlPlot.dataLineStyle mutableCopy];
+    CPTColor *urlColor = [CPTColor redColor];
     urlLineStyle.lineWidth = 2.5;
     urlLineStyle.lineColor = urlColor;
-    urlPlot.dataLineStyle = urlLineStyle;
     CPTMutableLineStyle *urlSymbolLineStyle = [CPTMutableLineStyle lineStyle];
     urlSymbolLineStyle.lineColor = urlColor;
     CPTPlotSymbol *urlSymbol = [CPTPlotSymbol ellipsePlotSymbol];
     urlSymbol.fill = [CPTFill fillWithColor:urlColor];
     urlSymbol.lineStyle = urlSymbolLineStyle;
     urlSymbol.size = CGSizeMake(6.0f, 6.0f);
-    urlPlot.plotSymbol = urlSymbol;
+
+    [self initializePlot:urlPlot lineStyle:urlLineStyle plotSymbol:urlSymbol identifier:@"URL Plot"];
     
+    CPTColor *thresholdColor = [CPTColor greenColor];
     CPTMutableLineStyle *thresholdLineStyle = [thresholdPlot.dataLineStyle mutableCopy];
-    thresholdLineStyle.lineWidth = 2.5;
+    thresholdLineStyle.lineWidth = 1.5;
     thresholdLineStyle.lineColor = thresholdColor;
-    thresholdPlot.dataLineStyle = thresholdLineStyle;
-    thresholdPlot.plotSymbol = nil;
+
+    [self initializePlot:thresholdPlot lineStyle:thresholdLineStyle plotSymbol:nil identifier:@"Threshold"];
+
+    CPTColor *averageColor = [CPTColor blueColor];
+    CPTMutableLineStyle *averageLineStyle = [averagePlot.dataLineStyle mutableCopy];
+    averageLineStyle.lineWidth = 1.5;
+    averageLineStyle.lineColor = averageColor;
+    
+    [self initializePlot:averagePlot lineStyle:averageLineStyle plotSymbol:nil identifier:@"Average"];
+    [self addLegendToGraph:graph];
+
     
 }
 
+-(void)initializePlot:(CPTScatterPlot *)plot lineStyle:(CPTLineStyle *)lineStyle plotSymbol:(CPTPlotSymbol *)plotSymbol identifier:(NSString *)identifier {
+    plot.dataLineStyle = lineStyle;
+    plot.dataSource = self;
+    plot.identifier = identifier;
+    plot.plotSymbol = plotSymbol;
+
+}
 -(void)configureAxes {
     
-    // plotting style is set to line plots
     CPTMutableLineStyle *lineStyle = [CPTMutableLineStyle lineStyle];
     lineStyle.lineColor = [CPTColor blackColor];
     lineStyle.lineWidth = 2.0f;
     
-
-    // X-axis parameters setting
-//    CPTXYAxisSet *axisSet = (id)graph.axisSet;
-    CPTXYAxisSet *axisSet = (CPTXYAxisSet *) self.hostView.hostedGraph.axisSet;
-    
-    [self getMinMaxXValue];
-
-    axisSet.xAxis.majorIntervalLength = CPTDecimalFromInt((maxXValue-minXValue)/10);
-    axisSet.xAxis.minorTicksPerInterval = 1;
-    axisSet.xAxis.orthogonalCoordinateDecimal = CPTDecimalFromInt(0); //added for date, adjust x line
-    axisSet.xAxis.majorTickLineStyle = lineStyle;
-    axisSet.xAxis.minorTickLineStyle = lineStyle;
-    axisSet.xAxis.axisLineStyle = lineStyle;
-    axisSet.xAxis.minorTickLength = 5.0f;
-    axisSet.xAxis.majorTickLength = 7.0f;
-    axisSet.xAxis.labelOffset = 2.0f;
-    axisSet.xAxis.titleOffset = 15.0f;
-    axisSet.xAxis.visibleRange   = [CPTPlotRange plotRangeWithLocation:CPTDecimalFromInteger(minXValue)
-                                                                length:CPTDecimalFromInteger(maxXValue-minXValue)];
-    axisSet.xAxis.gridLinesRange = [CPTPlotRange plotRangeWithLocation:CPTDecimalFromInteger(minXValue)
-                                                                length:CPTDecimalFromInteger(maxXValue-minXValue)];
-    
-    // added for date
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    //dateFormatter.dateStyle = kCFDateFormatterMediumStyle;
-    [dateFormatter setDateFormat:@"HH:mm"];
-    CPTTimeFormatter *timeFormatter = [[CPTTimeFormatter alloc] initWithDateFormatter:dateFormatter];
-    axisSet.xAxis.labelFormatter = timeFormatter;
-    axisSet.xAxis.title = @"Time of day";
-    
-    // Y-axis parameters setting
-    axisSet.yAxis.majorIntervalLength = CPTDecimalFromInt([self getYMajorInterval]);
-    axisSet.yAxis.minorTicksPerInterval = 2;
-    axisSet.yAxis.orthogonalCoordinateDecimal = CPTDecimalFromInt(minXValue); // added for date, adjusts y line
-    axisSet.yAxis.majorTickLineStyle = lineStyle;
-    axisSet.yAxis.minorTickLineStyle = lineStyle;
-    axisSet.yAxis.axisLineStyle = lineStyle;
-    axisSet.yAxis.minorTickLength = 5.0f;
-    axisSet.yAxis.majorTickLength = 7.0f;
-    axisSet.yAxis.labelOffset = 2.0f;
-    //axisSet.yAxis.titleOffset = 30.0f;
-    axisSet.yAxis.title = @"Load time (ms)";
-    axisSet.yAxis.visibleRange   = [CPTPlotRange plotRangeWithLocation:CPTDecimalFromInteger(0)
-                                                        length:CPTDecimalFromInteger(maxYValue)];
-    axisSet.yAxis.gridLinesRange = [CPTPlotRange plotRangeWithLocation:CPTDecimalFromInteger(0)
-                                                        length:CPTDecimalFromInteger(maxYValue)];
-
-    
-    // 1 - Create styles
     CPTMutableTextStyle *axisTitleStyle = [CPTMutableTextStyle textStyle];
     axisTitleStyle.color = [CPTColor whiteColor];
     axisTitleStyle.fontName = @"Helvetica-Bold";
     axisTitleStyle.fontSize = 12.0f;
+    
     CPTMutableLineStyle *axisLineStyle = [CPTMutableLineStyle lineStyle];
     axisLineStyle.lineWidth = 2.0f;
     axisLineStyle.lineColor = [CPTColor whiteColor];
+    
     CPTMutableTextStyle *axisTextStyle = [[CPTMutableTextStyle alloc] init];
     axisTextStyle.color = [CPTColor whiteColor];
     axisTextStyle.fontName = @"Helvetica-Bold";
     axisTextStyle.fontSize = 9.0f;
 
-    axisSet.yAxis.labelTextStyle = axisTextStyle;
-    axisSet.xAxis.labelTextStyle = axisTextStyle;
-
-    axisSet.xAxis.titleTextStyle = axisTitleStyle;
-    axisSet.yAxis.titleTextStyle = axisTitleStyle;
-
+    // added for date
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"HH:mm"];
+    CPTTimeFormatter *timeFormatter = [[CPTTimeFormatter alloc] initWithDateFormatter:dateFormatter];
+    
     // integer tick labels
     NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
-    CPTXYAxis *y = axisSet.yAxis;
-    y.labelFormatter = formatter;
+
     
+    CPTXYAxisSet *axisSet = (CPTXYAxisSet *) self.hostView.hostedGraph.axisSet;
+    
+    [self getMinMaxXValue];
+    
+    [self configureAxis:axisSet.xAxis title:@"Time of day" majorInterval:(maxXValue-minXValue)/10 minorTicksPerInterval:1 titleOffset:15.0f
+                    intersectsOtherAxisAt:0 lineStyle:lineStyle axisStyle:axisTextStyle titleStyle:axisTitleStyle labelFormatter:timeFormatter];
+    [self setAxisVisibility:axisSet.xAxis from:minXValue to:maxXValue];
+
+    [self configureAxis:axisSet.yAxis title:@"Load time (ms)" majorInterval:[self getYMajorInterval] minorTicksPerInterval:2 titleOffset:30.0f
+                        intersectsOtherAxisAt:minXValue lineStyle:lineStyle axisStyle:axisTextStyle titleStyle:axisTitleStyle labelFormatter:formatter];
+    [self setAxisVisibility:axisSet.yAxis from:0 to:maxYValue];
+
+    /*
     CPTMutableLineStyle *tickLineStyle = [CPTMutableLineStyle lineStyle];
     tickLineStyle.lineColor = [CPTColor whiteColor];
     tickLineStyle.lineWidth = 2.0f;
     CPTMutableLineStyle *gridLineStyle = [CPTMutableLineStyle lineStyle];
     tickLineStyle.lineColor = [CPTColor blackColor];
     tickLineStyle.lineWidth = 1.0f;
+     */
+}
+
+-(void)addLegendToGraph:(CPTGraph *)graph {
+    graph.legend = [CPTLegend legendWithGraph:graph];
+    graph.legend.fill = [CPTFill fillWithColor:[CPTColor darkGrayColor]];
+    graph.legend.cornerRadius = 5.0;
+    graph.legend.swatchSize = CGSizeMake(15.0, 15.0);
+    graph.legend.numberOfRows = 1;
+    graph.legendAnchor = CPTRectAnchorBottom;
+    graph.legendDisplacement = CGPointMake(0.0, 12.0);
+}
+
+-(void)configureAxis:(CPTXYAxis *)axis title:(NSString *)title majorInterval:(int)interval minorTicksPerInterval:(int)minorTicks
+            titleOffset:(CGFloat)titleOffset intersectsOtherAxisAt:(int)intersection lineStyle:(CPTLineStyle *)lineStyle
+            axisStyle:(CPTTextStyle *)axisStyle titleStyle:(CPTTextStyle *)titleStyle labelFormatter:(NSFormatter *)labelFormatter{
+    axis.majorIntervalLength = CPTDecimalFromInt(interval);
+    axis.minorTicksPerInterval = minorTicks;
+    axis.orthogonalCoordinateDecimal = CPTDecimalFromInt(intersection); //added for date, adjust x line
+    axis.majorTickLineStyle = lineStyle;
+    axis.minorTickLineStyle = lineStyle;
+    axis.axisLineStyle = lineStyle;
+    axis.minorTickLength = 5.0f;
+    axis.majorTickLength = 7.0f;
+    axis.labelOffset = 2.0f;
+    axis.titleOffset = titleOffset;
+    axis.title = title;
+    axis.labelTextStyle = axisStyle;
+    axis.titleTextStyle = titleStyle;
+    axis.labelFormatter = labelFormatter;
+}
+
+-(void)setAxisVisibility:(CPTXYAxis *)axis from:(int)from to:(int)to {
+    axis.visibleRange   = [CPTPlotRange plotRangeWithLocation:CPTDecimalFromInteger(from)
+                                                                length:CPTDecimalFromInteger(to-from)];
+    axis.gridLinesRange = [CPTPlotRange plotRangeWithLocation:CPTDecimalFromInteger(from)
+                                                                length:CPTDecimalFromInteger(to-from)];
 }
 
 // sets the limits on the axes for this plot
@@ -279,6 +293,8 @@
         if (thisVal > maxVal)
             maxVal = thisVal;
     }
+    if ([urlAverage integerValue] > maxVal)
+        maxVal = [urlAverage integerValue];
     return maxVal*1.2f;
 }
 
@@ -359,7 +375,10 @@
                 return [self getIntDate:[point objectForKey:@"created_at"]];
                 break;
             case CPTScatterPlotFieldY:
-                return [NSNumber numberWithInt:[urlThreshold integerValue]];
+                if ([plot.identifier isEqual:@"Threshold"] == YES)
+                    return [NSNumber numberWithInt:[urlThreshold integerValue]];
+                else
+                    return [NSNumber numberWithInt:[urlAverage integerValue]];
                 break;
         }
         return [NSDecimalNumber zero];
@@ -367,17 +386,49 @@
     }
     return [NSDecimalNumber zero];
 }
+/*
+- (BOOL) shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
+{
+	//	(iOS 5)
+	//	Only allow rotation to landscape
+	return (toInterfaceOrientation == UIInterfaceOrientationLandscapeLeft | toInterfaceOrientation == UIInterfaceOrientationLandscapeRight) ;
+}
+
+- (BOOL)shouldAutorotate
+{
+	//	(iOS 6)
+	//	No auto rotating
+	return YES;
+}
 
 
+- (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation
+{
+	//	(iOS 6)
+	//	Force to landscape
+	return UIInterfaceOrientationLandscapeLeft;
+}
+
+- (NSUInteger)supportedInterfaceOrientations
+{
+    //return UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskLandscapeLeft;
+    return UIInterfaceOrientationMaskLandscape;
+}
+*/
+
+// redraw on orientation change
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
+    [self initPlot];
+
+}
 
 
-
--(void)populateUrlPlot:(NSArray *)stats urlName:(NSString *)name urlId:(NSString *)thisId threshold:(NSString *)threshold {
+-(void)populateUrlPlot:(NSArray *)stats urlName:(NSString *)name urlId:(NSString *)thisId threshold:(NSString *)threshold average:(NSString *)average {
     urlStats = stats;
     urlName = name;
     urlId = thisId;
     urlThreshold = threshold;
-    
+    urlAverage = average;
 }
 
 @end

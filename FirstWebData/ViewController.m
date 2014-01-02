@@ -47,36 +47,44 @@
 
 -(void)downloadSuccessful:(BOOL)success withData:(UPGrabData *)grabData {
     [myActivityIndicator stopAnimating];
-    urlName.text = [grabData GetUrlValue:@"url"];
-    threshold.text = [grabData GetUrlValue:@"threshold"];
-    averageVal.text = [grabData GetUrlValue:@"average"];
-    lastMeasured.text = [NSString stringWithFormat:@"%@ ago",[grabData GetUrlValue:@"last_stat"]];
+    [self populateUrlDetails:grabData.urlVals];
 }
 
 -(void)populateUrlDetails:(NSDictionary *) dict {
+    
     urlName.text = [dict valueForKey:@"url"];
     thisUrlId = [dict valueForKey:@"id"];
-    threshold.text = [dict valueForKey:@"threshold"];
-    averageVal.text = [dict valueForKey:@"average"];
-    latestVal.text = [dict valueForKey:@"latest_val"];
-    lastMeasured.text = [NSString stringWithFormat:@"%@ ago",[dict valueForKey:@"last_stat"]];
+    urlThreshold = [dict valueForKey:@"threshold"];
+    urlAverage = [dict valueForKey:@"average"];
+    threshold.text = [self formatStringIntegerWithThousands:urlThreshold];
+    averageVal.text = [self formatStringIntegerWithThousands:urlAverage];
+    latestVal.text = [self formatStringIntegerWithThousands:[dict valueForKey:@"latest_val"]];
+    lastMeasured.text = [dict valueForKey:@"last_stat"];
     NSString *isDown = [dict objectForKey:@"is_down"] ;
     NSString *isOverThreshold = [dict objectForKey:@"is_over_threshold"];
     NSString *isRecentRecovered = [dict objectForKey:@"recovery"];
 
     errorField.text = [dict objectForKey:@"message"];
     UIColor *redColour = [UIColor redColor];
-    UIColor *yellowColour = [UIColor yellowColor];
+    UIColor *brownColour = [UIColor brownColor];
     UIColor *greenColour = [UIColor greenColor];
     if ([isDown boolValue] || [isOverThreshold boolValue])
         errorField.textColor = redColour;
     else if ([isRecentRecovered boolValue])
-        errorField.textColor = yellowColour;
+        errorField.textColor = brownColour;
     else
         errorField.textColor = greenColour;
     
     urlStats = [dict objectForKey:@"stats"];
     
+}
+
+-(NSString *)formatStringIntegerWithThousands:(NSString *)numStr {
+    int num = [numStr integerValue];
+    NSNumberFormatter* numberFormatter = [[NSNumberFormatter alloc] init];
+    [numberFormatter setFormatterBehavior: NSNumberFormatterBehavior10_4];
+    [numberFormatter setNumberStyle: NSNumberFormatterDecimalStyle];
+    return [numberFormatter stringFromNumber: [NSNumber numberWithInteger: num]];
 }
 
 -(IBAction)GetUrl:(id)sender{
@@ -196,16 +204,30 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-
+/*
+- (NSUInteger)supportedInterfaceOrientations
+{
+    //return UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskLandscapeLeft;
+    return UIInterfaceOrientationMaskLandscapeLeft;
+}
+*/
 -(IBAction)GetUrlPlot:(id)sender
 {
     UIStoryboard *sboard = [UIStoryboard storyboardWithName:@"MainStoryboard"
                                                      bundle:nil];
     UPPlotViewController *urlPlot = [sboard instantiateViewControllerWithIdentifier:@"idUrlPlot"];
+   // [self.navigationController ]
     
     [self.navigationController pushViewController:urlPlot animated:YES];
-    [urlPlot populateUrlPlot:urlStats urlName:urlName.text urlId:thisUrlId threshold:threshold.text];
+    [urlPlot populateUrlPlot:urlStats urlName:urlName.text urlId:thisUrlId threshold:urlThreshold average:urlAverage];
     
 }
+
+// redraw on orientation change
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
+    [self viewDidLoad];
+    
+}
+
 
 @end

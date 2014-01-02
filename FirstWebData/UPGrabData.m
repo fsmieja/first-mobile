@@ -84,7 +84,6 @@
         else if ([[request.userInfo objectForKey:@"type"] isEqualToString:@"urllist"]) {
             NSDictionary *jsonArray = (NSDictionary *)[parser objectWithString:responseString error:nil];
             self.urlList = (NSArray *)jsonArray ;
-//            self.urlList = [jsonArray valueForKey:@"url"];
             [[self delegate] downloadSuccessful:YES withData:self];
         }
     }

@@ -11,6 +11,7 @@
 
 char *name;
 NSString *thisUrlId;
+NSString *urlName, *urlThreshold, *urlAverage;
 NSArray *urlStats;
 
 @interface ViewController : UIViewController <UITextFieldDelegate>

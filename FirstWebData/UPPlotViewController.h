@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 NSString *urlId;
-NSString *urlName, *urlThreshold;
+NSString *urlName, *urlThreshold, *urlAverage;
 NSArray *urlStats;
 int maxYValue, minXValue, maxXValue;
 
@@ -19,10 +19,16 @@ int maxYValue, minXValue, maxXValue;
 @property (copy) NSDictionary *urlData;
 
 
--(void)populateUrlPlot:(NSArray *)stats urlName:(NSString *)name urlId:(NSString *)thisId threshold:(NSString *)threshold;
+-(void)populateUrlPlot:(NSArray *)stats urlName:(NSString *)name urlId:(NSString *)thisId threshold:(NSString *)threshold average:(NSString *)average;
 -(NSNumber *)getIntDate:(NSString *)dateString;
 -(void)setAxesLimits:(CPTXYPlotSpace *)plotSpace;
 -(int)getMaxYValue;
 -(int)getMinXValue;
 -(int)getYMajorInterval;
+-(void)configureAxis:(CPTXYAxis *)axis title:(NSString *)title majorInterval:(int)interval
+        minorTicksPerInterval:(int)minorTicks titleOffset:(CGFloat)titleOffset intersectsOtherAxisAt:(int)intersection
+        lineStyle:(CPTLineStyle *)lineStyle axisStyle:axisTextStyle titleStyle:axisTitleStyle labelFormatter:formatter;
+-(void)setAxisVisibility:(CPTXYAxis *)axis from:(int)from to:(int)to;
+-(void)addLegendToGraph:(CPTGraph *)graph;
+-(void)initializePlot:(CPTScatterPlot *)plot lineStyle:(CPTLineStyle *)lineStyle plotSymbol:(CPTPlotSymbol *)plotSymbol identifier:(NSString *)identifier;
 @end
