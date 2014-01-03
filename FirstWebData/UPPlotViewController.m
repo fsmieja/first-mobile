@@ -81,7 +81,12 @@
     titleStyle.color = [CPTColor whiteColor];
     titleStyle.fontName = @"Helvetica-Bold";
     
-    if ([title length] > 30 && UIDeviceOrientationIsPortrait(self.interfaceOrientation))
+    if ([title length] > 52) {
+        titleStyle.fontSize = 12.0f;
+        if (UIDeviceOrientationIsPortrait(self.interfaceOrientation))
+            graph.title = [NSString stringWithFormat:@"%@...", [title substringToIndex:52]];
+    }
+    else if ([title length] > 30 && UIDeviceOrientationIsPortrait(self.interfaceOrientation))
         titleStyle.fontSize = 12.0f;
     else
         titleStyle.fontSize = 16.0f;
@@ -176,7 +181,7 @@
     CPTMutableTextStyle *axisTitleStyle = [CPTMutableTextStyle textStyle];
     axisTitleStyle.color = [CPTColor whiteColor];
     axisTitleStyle.fontName = @"Helvetica-Bold";
-    axisTitleStyle.fontSize = 12.0f;
+    axisTitleStyle.fontSize = 11.0f;
     
     CPTMutableLineStyle *axisLineStyle = [CPTMutableLineStyle lineStyle];
     axisLineStyle.lineWidth = 2.0f;
@@ -204,7 +209,7 @@
                     intersectsOtherAxisAt:0 lineStyle:lineStyle axisStyle:axisTextStyle titleStyle:axisTitleStyle labelFormatter:timeFormatter];
     [self setAxisVisibility:axisSet.xAxis from:minXValue to:maxXValue];
 
-    [self configureAxis:axisSet.yAxis title:@"Load time (ms)" majorInterval:[self getYMajorInterval] minorTicksPerInterval:2 titleOffset:30.0f
+    [self configureAxis:axisSet.yAxis title:@"Load time (ms)" majorInterval:[self getYMajorInterval] minorTicksPerInterval:2 titleOffset:25.0f
                         intersectsOtherAxisAt:minXValue lineStyle:lineStyle axisStyle:axisTextStyle titleStyle:axisTitleStyle labelFormatter:formatter];
     [self setAxisVisibility:axisSet.yAxis from:0 to:maxYValue];
 

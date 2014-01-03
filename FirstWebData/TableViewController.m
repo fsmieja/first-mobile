@@ -92,6 +92,8 @@ UPGrabData *grabData;
 }
 
 -(IBAction)Logout:(id)sender{
+    [tableData removeAllObjects];
+    [self.tableView reloadData];
   //  [ASIHTTPRequest removeCredentialsForHost:@"orion" port:0 protocol:@"http" realm:nil];
     [ASIHTTPRequest clearSession];
     NSURLCredentialStorage *store = [NSURLCredentialStorage sharedCredentialStorage];
@@ -109,6 +111,7 @@ UPGrabData *grabData;
     [ASIHTTPRequest removeCredentialsForHost:[url host] port:[[url port] intValue] protocol:[url scheme] realm:kConnectorRealm];
      */
     NSLog(@"logged out");
+    [self viewDidLoad];
 
 }
 
@@ -163,6 +166,7 @@ UPGrabData *grabData;
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
+
     return [tableData count];
 }
 

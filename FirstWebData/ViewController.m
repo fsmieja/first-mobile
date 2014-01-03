@@ -66,15 +66,14 @@
 
     errorField.text = [dict objectForKey:@"message"];
     UIColor *redColour = [UIColor redColor];
-    UIColor *brownColour = [UIColor brownColor];
-    UIColor *greenColour = [UIColor greenColor];
+    UIColor *brownColour = [UIColor blueColor];
+    UIColor *greenColour = [UIColor colorWithRed:0 green:0.5 blue:0 alpha:1];
     if ([isDown boolValue] || [isOverThreshold boolValue])
         errorField.textColor = redColour;
     else if ([isRecentRecovered boolValue])
         errorField.textColor = brownColour;
     else
         errorField.textColor = greenColour;
-    
     urlStats = [dict objectForKey:@"stats"];
     
 }
